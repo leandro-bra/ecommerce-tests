@@ -1,0 +1,23 @@
+{
+  "usuarioSucesso": {
+    "nome": "Mariana",
+    "email": "mariana.alves1@example.com",
+    "senha": "Teste@2026Senha",
+    "genero": "Mrs",
+    "diaNascimento": "14",
+    "mesNascimento": "6",
+    "anoNascimento": "1995",
+    "newsletter": true,
+    "ofertas": true,
+    "primeiroNome": "Mariana",
+    "sobrenome": "Alves",
+    "empresa": "Alves Tecnologia Ltda",
+    "endereco": "Avenida Paulista, 1000",
+    "complemento": "Apto 82",
+    "pais": "United States",
+    "estado": "Ocklahoma",
+    "cidade": "Ocklahoma City",
+    "cep": "01310-100",
+    "celular": "11987654321"
+  }
+}
