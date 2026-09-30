@@ -3,25 +3,13 @@ import { LoginPage } from "../support/pages/login-page";
 import usuarios from "./../fixtures/usuarios.json";
 import { usuarioModel } from "../fixtures/usuario.model";
 import { CadastroPage } from "../support/pages/cadastro-page";
+import { deletaUsuario } from "../support/api-support";
 import { faker } from "@faker-js/faker";
 
 test.beforeEach(async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.open();
 });
-
-async function deletaUsuario(request: APIRequestContext, usuario: usuarioModel) {
-  const dadosConta = {
-    email: usuario.email,
-    password: usuario.senha,
-  };
-  const resposta = await request.delete("/api/deleteAccount", {
-    form: dadosConta,
-  });
-  const corpoResposta = await resposta.text();
-  expect(resposta.status()).toEqual(200);
-  expect(corpoResposta).toContain("Account deleted!");
-}
 
 test.describe("Caminho feliz", () => {
   test("Deve cadastrar novo usuário com sucesso", async ({ page, request }) => {
@@ -40,7 +28,7 @@ test.describe("Caminho feliz", () => {
     await expect(cadastroPage.accountInfoCaption).toBeVisible();
     await cadastroPage.realizaCadastro(usuario);
     await expect(cadastroPage.accountCreated).toBeVisible();
-    await deletaUsuario(request, usuario);
+    await deletaUsuario(request, usuario.email, usuario.senha);
   });
 });
 
@@ -182,6 +170,6 @@ test.describe("Excessão", () => {
       "Email Address already exist!",
     );
 
-    await deletaUsuario(request, usuario)
+    await deletaUsuario(request, usuario.email, usuario.senha)
   });
 });

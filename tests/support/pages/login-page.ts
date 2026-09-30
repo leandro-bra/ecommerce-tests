@@ -12,6 +12,9 @@ export class LoginPage {
   readonly signUpEmail: Locator;
   readonly signUpButton: Locator;
   readonly existEmailMessage: Locator;
+  readonly incorrectCredentials: Locator;
+  readonly logout: Locator;
+  readonly deleteAccount: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -27,16 +30,23 @@ export class LoginPage {
     this.userName = page.locator('[data-qa="signup-name"]');
     this.signUpEmail = page.locator('[data-qa="signup-email"]');
     this.signUpButton = page.locator('[data-qa="signup-button"]');
-    this.existEmailMessage = page.getByText('Email Address already exist!')
+    this.existEmailMessage = page.getByText("Email Address already exist!");
+    this.incorrectCredentials = page.getByText(
+      "Your email or password is incorrect!",
+    );
+    this.logout = page.getByRole("link", { name: "logout" });
+    this.deleteAccount = page
+      .getByRole("listitem")
+      .filter({ hasText: "Delete Account" });
   }
 
   async open() {
     await this.page.goto("/login");
   }
 
-  async realizarLogin(usuario: usuarioModel) {
-    await this.loginEmail.fill(usuario.email);
-    await this.loginPassword.fill(usuario.senha);
+  async realizaLogin(email: string, senha: string) {
+    await this.loginEmail.fill(email);
+    await this.loginPassword.fill(senha);
     await this.loginButton.click();
   }
 
