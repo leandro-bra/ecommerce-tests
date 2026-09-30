@@ -31,7 +31,7 @@ export class LoginPage {
   }
 
   async open() {
-    await this.page.goto("https://automationexercise.com/login");
+    await this.page.goto("/login");
   }
 
   async realizarLogin(usuario: usuarioModel) {

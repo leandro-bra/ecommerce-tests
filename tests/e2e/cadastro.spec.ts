@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, APIRequestContext } from "@playwright/test";
 import { LoginPage } from "../support/pages/login-page";
 import usuarios from "./../fixtures/usuarios.json";
 import { usuarioModel } from "../fixtures/usuario.model";
@@ -10,9 +10,25 @@ test.beforeEach(async ({ page }) => {
   await loginPage.open();
 });
 
+async function deletaUsuario(request: APIRequestContext, usuario: usuarioModel) {
+  const dadosConta = {
+    email: usuario.email,
+    password: usuario.senha,
+  };
+  const resposta = await request.delete("/api/deleteAccount", {
+    form: dadosConta,
+  });
+  const corpoResposta = await resposta.text();
+  expect(resposta.status()).toEqual(200);
+  expect(corpoResposta).toContain("Account deleted!");
+}
+
 test.describe("Caminho feliz", () => {
-  test("Deve cadastrar novo usuário com sucesso", async ({ page }) => {
-    let usuario = usuarios.usuarioSucesso as usuarioModel;
+  test("Deve cadastrar novo usuário com sucesso", async ({ page, request }) => {
+    let usuario = {
+      ...usuarios.usuarioSucesso,
+    } as usuarioModel;
+
     const emailRandon = faker.internet.email;
     usuario.email = emailRandon({ firstName: usuario.primeiroNome });
 
@@ -23,6 +39,8 @@ test.describe("Caminho feliz", () => {
     await loginPage.iniciaCadastro(usuario);
     await expect(cadastroPage.accountInfoCaption).toBeVisible();
     await cadastroPage.realizaCadastro(usuario);
+    await expect(cadastroPage.accountCreated).toBeVisible();
+    await deletaUsuario(request, usuario);
   });
 });
 
@@ -30,7 +48,9 @@ test.describe("Campos obrigatórios", () => {
   test("Deve exibir mensagem de campo obrigatório ao tentar criar conta sem preencher campo 'Name'", async ({
     page,
   }) => {
-    let usuario = usuarios.usuarioSucesso as usuarioModel;
+    let usuario = {
+      ...usuarios.usuarioSucesso,
+    } as usuarioModel;
     const emailRandon = faker.internet.email;
     usuario.email = emailRandon({ firstName: usuario.primeiroNome });
     usuario.nome = "";
@@ -44,13 +64,15 @@ test.describe("Campos obrigatórios", () => {
       }
       throw new Error("O elemento não é um input de formulário");
     });
-    expect(mensagem).not.toBeNull;
+    expect(mensagem).not.toBe("");
   });
 
   test("Deve exibir mensagem de campo obrigatório ao tentar criar conta sem preencher campo 'Email Adress'", async ({
     page,
   }) => {
-    let usuario = usuarios.usuarioSucesso as usuarioModel;
+    let usuario = {
+      ...usuarios.usuarioSucesso,
+    } as usuarioModel;
     usuario.email = "";
 
     const loginPage = new LoginPage(page);
@@ -62,7 +84,7 @@ test.describe("Campos obrigatórios", () => {
       }
       throw new Error("O elemento não é um input de formulário");
     });
-    expect(mensagem).not.toBeNull;
+    expect(mensagem).not.toBeNull();
   });
 
   const usuario = { ...usuarios.usuarioSucesso } as usuarioModel;
@@ -123,7 +145,9 @@ test.describe("Excessão", () => {
     request,
     page,
   }) => {
-    const usuario = usuarios.usuarioSucesso as usuarioModel;
+    let usuario = {
+      ...usuarios.usuarioSucesso,
+    } as usuarioModel;
     usuario.email = faker.internet.email({ firstName: usuario.nome });
     const dadosConta = {
       name: usuario.nome,
@@ -149,11 +173,15 @@ test.describe("Excessão", () => {
       form: dadosConta,
     });
     expect(resposta.status()).toEqual(200);
-    (await resposta.text()).includes("User created!");
+    const corpoResposta = await resposta.text();
+    expect(corpoResposta).toContain("User created!");
+
     const loginPage = new LoginPage(page);
-    loginPage.iniciaCadastro(usuario);
+    await loginPage.iniciaCadastro(usuario);
     await expect(loginPage.existEmailMessage).toContainText(
       "Email Address already exist!",
     );
+
+    await deletaUsuario(request, usuario)
   });
 });
