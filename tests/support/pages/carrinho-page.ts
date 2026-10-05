@@ -23,7 +23,7 @@ export class CarrinhoPage {
     this.primeiroProduto = page.locator('id="product-1"');
     this.quantidadePrimeiroProduto = page.locator(".cart_quantity button");
     this.precoPrimeiroProduto = page.getByText("Rs.").first();
-    this.precoTotal = page.locator(".cart_total_price");
+    this.precoTotal = page.locator(".cart_total_price").first();
     this.botaoRemoverProduto = page.locator(".cart_quantity_delete");
     this.linkLoginModalCheckout = page.getByRole("link", {
       name: "Register / Login",
