@@ -78,4 +78,13 @@ test.describe("Cenários de caminho feliz", () => {
     expect(total).toEqual(1000);
     expect(valorProduto * quantidadeProduto).toEqual(total);
   });
+
+  test("Deve remover um produto da lista no carrinho", async({page})=>{
+    const carrinhoPage = new CarrinhoPage(page);
+    await carrinhoPage.open();
+    await expect(carrinhoPage.tituloCarrinho).toBeVisible();
+    await expect(carrinhoPage.linkDetalheProduto).toBeVisible();
+    await carrinhoPage.botaoRemoverProduto.click();
+    await expect(carrinhoPage.carrinhoVazio).toBeVisible();
+  });
 });

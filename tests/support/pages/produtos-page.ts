@@ -18,9 +18,11 @@ export class ProdutosPage {
     this.inputBuscaProduto = page.getByRole("textbox", {
       name: "Search Product",
     });
-    this.produtoOverlay = page.locator('.product-image-wrapper').first()
+    this.produtoOverlay = page.locator(".product-image-wrapper").first();
     this.titleAllProducts = page.getByRole("heading", { name: "All Products" });
-    this.buttonAddToCartPrimeiroProduto = page.getByText('Add to cart').nth(1);
+    this.buttonAddToCartPrimeiroProduto = page.locator(
+      '.productinfo a.add-to-cart[data-product-id="1"]',
+    );
     this.buttonBuscaProduto = page.locator("#submit_search");
     this.titleProductAdded = page.getByRole("heading", { name: "Added!" });
     this.messageProductAdded = page.getByText("Your product has been added");
@@ -33,14 +35,10 @@ export class ProdutosPage {
     await this.page.goto("/products");
   }
 
-  async adicionarUmProdutoNoCarrinho(){
-        await this.produtoOverlay.hover({scroll:"auto"});
-        await this.buttonAddToCartPrimeiroProduto.waitFor({state:"visible"});
-        await this.buttonAddToCartPrimeiroProduto.click();
-        await expect(this.titleProductAdded).toBeVisible();
-        await expect(this.messageProductAdded).toBeVisible();
-        await this.buttonContinue.click();
+  async adicionarUmProdutoNoCarrinho() {
+    await this.buttonAddToCartPrimeiroProduto.click();
+    await expect(this.titleProductAdded).toBeVisible();
+    await expect(this.messageProductAdded).toBeVisible();
+    await this.buttonContinue.click();
   }
-
-
 }
